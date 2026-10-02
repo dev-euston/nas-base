@@ -1,0 +1,46 @@
+services:
+  openclaw-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.openclaw
+    image: openclaw-claude:latest
+    ports:
+      - "${OPENCLAW_PORT:-18789}:18789"
+    environment:
+      OPENCLAW_STATE_DIR: /home/node/.openclaw
+      OPENCLAW_CONFIG_PATH: /app/openclaw-config.json
+      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+      OPENCLAW_NO_RESPAWN: "1"
+      NODE_COMPILE_CACHE: /home/node/.openclaw/compile-cache
+      OPENCLAW_GATEWAY_PASSWORD: ${OPENCLAW_GATEWAY_PASSWORD}
+    volumes:
+      - claude-auth:/home/node
+      - ${WORKSPACE_PATH}:/home/node/.openclaw/workspace
+      - ${FILES_PATH}:/nas
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  openclaw-cli:
+    image: openclaw-claude:latest
+    network_mode: "service:openclaw-gateway"
+    depends_on:
+      openclaw-gateway:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+    volumes:
+      - claude-auth:/home/node
+      - ${WORKSPACE_PATH}:/home/node/.openclaw/workspace
+      - ${FILES_PATH}:/nas
+
+volumes:
+  claude-auth:
+    external: true

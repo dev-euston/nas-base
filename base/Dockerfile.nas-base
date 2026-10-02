@@ -1,0 +1,11 @@
+FROM node:slim
+
+LABEL org.opencontainers.image.title="nas-base"
+LABEL org.opencontainers.image.description="Base image for NAS containers — Node.js + Claude Code CLI"
+
+RUN npm install -g --allow-scripts=@anthropic-ai/claude-code @anthropic-ai/claude-code
+
+USER node
+WORKDIR /home/node
+
+CMD ["sleep", "infinity"]

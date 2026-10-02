@@ -1,0 +1,7 @@
+FROM ghcr.io/openclaw/openclaw:latest
+
+USER root
+RUN npm install -g --allow-scripts=@anthropic-ai/claude-code @anthropic-ai/claude-code
+USER node
+
+COPY --chown=node:node openclaw.json /app/openclaw-config.json

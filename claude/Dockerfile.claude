@@ -1,0 +1,5 @@
+FROM media-base:latest
+
+WORKDIR /media
+
+CMD ["claude"]

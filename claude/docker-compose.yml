@@ -1,0 +1,30 @@
+services:
+  nas-base:
+    build:
+      context: ../base
+      dockerfile: Dockerfile.nas-base
+    image: nas-base:latest
+    volumes:
+      - claude-auth:/home/node
+
+  media-base:
+    build:
+      context: ../base
+      dockerfile: Dockerfile.media-base
+    image: media-base:latest
+
+  claude:
+    build:
+      context: .
+      dockerfile: Dockerfile.claude
+    image: claude-interactive:latest
+    stdin_open: true
+    tty: true
+    working_dir: /media
+    volumes:
+      - claude-auth:/home/node
+      - ${MEDIA_PATH:-/media}:/media
+
+volumes:
+  claude-auth:
+    name: claude-auth
